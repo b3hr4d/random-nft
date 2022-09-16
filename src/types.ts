@@ -10,7 +10,7 @@ export enum TileAttributes {
   Effect,
   UnBuildable,
   Tree,
-  Charchol,
+  Charcoal,
   Iron,
   Gold,
   Crystal,

@@ -27,10 +27,7 @@ loadImage("./src/assets/Texture.png").then(async (image) => {
 
     const canvas = drawFromMap(image, tileMap)
     // get the row and col of the tile map
-    let buildable = {
-      trait_type: "Build Power",
-      value: 0,
-    }
+    let buildable = { trait_type: "Buildable", value: 0 }
     let unBuildable = { trait_type: "UnBuildable", value: 0 }
 
     const attributes: StandardType[] = [
@@ -104,7 +101,7 @@ const allData: Attributes = {
   Effect: 0,
   UnBuildable: 0,
   Tree: 0,
-  Charchol: 0,
+  Charcoal: 0,
   Iron: 0,
   Gold: 0,
   Crystal: 0,
