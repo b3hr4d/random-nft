@@ -17,7 +17,7 @@ ctx.translate(width / 2, tileHeight * 2.5)
 // generate random tile map
 export const generateTile = (
   typeChance = [60, 20, 15, 5],
-  tileChance = [30, 20, 15, 10, 10, 7, 5, 2.5, 1]
+  tileChance = [30, 20, 20, 10, 10, 7, 5, 2.5, 1]
 ) => {
   const randomType = typeChance.reduce(
     (acc, cur, index) => (isRandom(cur) ? index : acc),
@@ -33,7 +33,7 @@ export const generateTile = (
     const uinque = (randomTile > 0 ? randomTile : 0) * rows + randomType
 
     // if the tile is already exist on map, then generate another one
-    if (randomTile !== 0 && newTileMap.includes(uinque))
+    if (randomTile !== 0 && randomTile !== 2 && newTileMap.includes(uinque))
       newTileMap[i] = randomType
     else newTileMap[i] = uinque
   }

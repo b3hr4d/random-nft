@@ -3,7 +3,7 @@ import { promises } from "fs"
 import { File, FilesSource } from "nft.storage"
 import { join } from "path"
 import { drawFromMap, generateTile, rows } from "./canvas"
-import { storeDirectory, storeImage } from "./ipfs"
+import { ipfsDirectory, ipfsImage } from "./ipfs"
 import {
   Attr,
   Attributes,
@@ -27,31 +27,50 @@ loadImage("./src/assets/Texture.png").then(async (image) => {
 
     const canvas = drawFromMap(image, tileMap)
     // get the row and col of the tile map
-    const attributes = tileMap.reduce(
-      (all, item) => {
-        const value = TileAttributes[Math.trunc(item / rows)] as Attr
+    let buildable = {
+      trait_type: "Build Power",
+      value: 0,
+    }
+    let unBuildable = { trait_type: "UnBuildable", value: 0 }
 
-        if (value === "Base") return all
-
-        allData[value]++
-        return [...all, { value }]
+    const attributes: StandardType[] = [
+      {
+        trait_type: "Base",
+        value: type,
       },
-      [
-        {
-          trait_type: "Base",
-          value: type,
-        },
-      ] as StandardType[]
-    )
+      buildable,
+      unBuildable,
+    ]
+
+    tileMap.forEach((item) => {
+      const value = TileAttributes[Math.trunc(item / rows)] as Attr
+
+      allData[value]++
+      switch (value) {
+        case "Base":
+          buildable.value++
+          break
+        case "Effect":
+          buildable.value++
+          break
+        case "UnBuildable":
+          unBuildable.value++
+          break
+        default:
+          attributes.push({ trait_type: "Resource", value })
+          break
+      }
+    })
     try {
       const pngData = await canvas.encode("png")
-      const url = await storeImage(pngData, i.toString())
+      const url = await ipfsImage(pngData, i.toString())
+
       console.log(i, url)
       const metadata = {
         name: `SmartLand #${i}`,
-        external_url: "https://smartworld.app/nft/3",
+        external_url: `https://smartworld.app/nft/${i}`,
         description:
-          "SmartLand is a collection of 10000 unique NFTs, it leaves in the 3d Earth on the home page of the website. <a href='smartworld.app'>SmartWorld</a>",
+          "It leaves in the 3d Earth on the home page of the website.",
         image: `ipfs://${url}`,
         attributes,
       }
@@ -68,11 +87,12 @@ loadImage("./src/assets/Texture.png").then(async (image) => {
       // @ts-ignore
       allNFT[i] = nft
     } catch (err) {
-      console.log(err)
+      console.log("url: ", err)
     }
   }
   await saveJson(allData, "./assets/allData.json")
-  return await storeDirectory(allNFT)
+  const allUrl = await ipfsDirectory(allNFT)
+  console.log(allUrl)
 })
 
 const allData: Attributes = {

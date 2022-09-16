@@ -23,8 +23,9 @@ export type Attr = keyof typeof TileAttributes
 type AllData = Type | Attr
 
 export type StandardType = {
+  display_type?: string
   trait_type?: string
-  value: Attr | Type
+  value: Attr | Type | number
 }
 
 export type Attributes = {
