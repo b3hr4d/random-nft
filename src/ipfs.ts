@@ -1,30 +1,17 @@
-// making metadata for opensea nft and uploading it to IPFS
-import { create } from "ipfs-http-client"
+import { File, FilesSource, NFTStorage } from "nft.storage"
 
-const ipfs = create({
-  host: "ipfs.infura.io",
-  port: 5001,
-  protocol: "https",
-})
+const NFT_STORAGE_TOKEN =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweEUwRWIxNTFFZTYwQTdCNjgxODg0OEM0N2E5MDFjOTYyRkI4MjA3ODAiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY2MzIzNjY4OTg0MiwibmFtZSI6IlNtYXJ0TGFuZCJ9.80TUpP0W3mQbJukiMFuVpm-fRigdDLfZ9sI2QZKAIac"
+const client = new NFTStorage({ token: NFT_STORAGE_TOKEN })
 
-const metadata = {
-  name: "My NFT",
-  description: "This is my first NFT",
-  image: "https://i.imgur.com/3ZQYqXl.png",
-  attributes: [
-    {
-      trait_type: "Background",
-      value: "Blue",
-    },
-    {
-      trait_type: "Eyes",
-      value: "Happy",
-    },
-  ],
+export const storeImage = async (image: BlobPart, name: string) => {
+  const imageFile = new File([image], `${name}.png`, {
+    type: "image/png",
+  })
+
+  return await client.storeBlob(imageFile)
 }
 
-const metadataJson = JSON.stringify(metadata)
-const metadataBuffer = Buffer.from(metadataJson)
-
-const metadataCid = async () => await ipfs.add(metadataBuffer)
-console.log(metadataCid)
+export const storeDirectory = async (file: FilesSource) => {
+  return await client.storeDirectory(file)
+}

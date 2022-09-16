@@ -20,10 +20,15 @@ export enum TileAttributes {
 export type Type = keyof typeof TileType
 export type Attr = keyof typeof TileAttributes
 
-export type Attributes = {
-  [key in Attr]: number
+type AllData = Type | Attr
+
+export type StandardType = {
+  trait_type?: string
+  value: Attr | Type
 }
 
-export type Tile = {
-  [key in Type]: { count: number; attributes: Attributes }
+export type Attributes = {
+  [key in AllData]: number
 }
+
+export type Tile = Attributes

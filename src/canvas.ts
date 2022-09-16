@@ -3,21 +3,21 @@ import { isRandom } from "./utile"
 
 export const tileHeight = 64,
   tileWidth = 130,
-  tileNumber = 6,
+  tileNumber = 4,
   texWidth = 130,
   texHeight = 230,
   rows = 9,
   width = tileWidth * tileNumber,
-  height = tileHeight * tileNumber + 40,
+  height = tileWidth * tileNumber,
   canvas = createCanvas(width, height)
 
 const ctx = canvas.getContext("2d")
-ctx.translate(width / 2, 0)
+ctx.translate(width / 2, tileHeight * 2.5)
 
 // generate random tile map
 export const generateTile = (
   typeChance = [60, 20, 15, 5],
-  tileChance = [50, 10, 10, 10, 7, 5, 2.5, 1, 0.5]
+  tileChance = [30, 20, 15, 10, 10, 7, 5, 2.5, 1]
 ) => {
   const randomType = typeChance.reduce(
     (acc, cur, index) => (isRandom(cur) ? index : acc),
@@ -25,11 +25,17 @@ export const generateTile = (
   )
 
   const newTileMap = new Uint8Array(tileNumber * tileNumber)
+
+  //each map can have 1 special tile
   for (let i = 0; i < tileNumber * tileNumber; i++) {
-    //get a random tile based on tileChance
     const randomTile = tileChance.findIndex((cur) => isRandom(cur))
 
-    newTileMap[i] = (randomTile > 0 ? randomTile : 0) * rows + randomType
+    const uinque = (randomTile > 0 ? randomTile : 0) * rows + randomType
+
+    // if the tile is already exist on map, then generate another one
+    if (randomTile !== 0 && newTileMap.includes(uinque))
+      newTileMap[i] = randomType
+    else newTileMap[i] = uinque
   }
 
   return newTileMap
