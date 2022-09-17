@@ -22,6 +22,14 @@ export type Attr = keyof typeof TileAttributes
 
 type AllData = Type | Attr
 
+export interface MetaData {
+  name: string
+  external_url: string
+  description: string
+  image: string
+  attributes: StandardType[]
+}
+
 export type StandardType = {
   display_type?: string
   trait_type?: string

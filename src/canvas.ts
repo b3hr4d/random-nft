@@ -1,5 +1,5 @@
 import { createCanvas } from "@napi-rs/canvas"
-import { isRandom } from "./utile"
+import { selectRandom } from "./utile"
 
 export const tileHeight = 64,
   tileWidth = 130,
@@ -15,33 +15,27 @@ const ctx = canvas.getContext("2d")
 ctx.translate(width / 2, tileHeight * 2.5)
 
 // generate random tile map
-export const generateTile = (
-  typeChance = [60, 20, 15, 5],
-  tileChance = [30, 20, 20, 10, 10, 7, 5, 2.5, 1]
-) => {
+export const generateTileMap = (typeChance: number[], tileChance: number[]) => {
   const randomType = typeChance.reduce(
-    (acc, cur, index) => (isRandom(cur) ? index : acc),
+    (acc, cur, index) => (selectRandom(cur) ? index : acc),
     0
   )
 
-  const newTileMap = new Uint8Array(tileNumber * tileNumber)
+  const newTileMap: number[] = Array.from({ length: tileNumber * tileNumber })
 
-  //each map can have 1 special tile
-  for (let i = 0; i < tileNumber * tileNumber; i++) {
-    const randomTile = tileChance.findIndex((cur) => isRandom(cur))
+  return newTileMap.reduce((all) => {
+    const randomIndex = tileChance.findIndex((cur) => selectRandom(cur))
+    const randomTile = randomIndex > 0 ? randomIndex : 0
 
-    const uinque = (randomTile > 0 ? randomTile : 0) * rows + randomType
+    const isUnique = randomTile !== 0 && randomTile !== 2
 
-    // if the tile is already exist on map, then generate another one
-    if (randomTile !== 0 && randomTile !== 2 && newTileMap.includes(uinque))
-      newTileMap[i] = randomType
-    else newTileMap[i] = uinque
-  }
+    const tile = randomTile * rows + randomType
 
-  return newTileMap
+    return [...all, isUnique && all.includes(tile) ? randomType : tile]
+  }, [] as number[])
 }
 
-export const drawFromMap = (img: any, tileMap: Uint8Array) => {
+export const drawFromMap = (img: any, tileMap: number[]) => {
   clear()
 
   tileMap.forEach((t: number, i: number) => {

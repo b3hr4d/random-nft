@@ -1,68 +1,23 @@
 import { loadImage } from "@napi-rs/canvas"
-import { promises } from "fs"
-import { File, FilesSource } from "nft.storage"
-import { join } from "path"
-import { drawFromMap, generateTile, rows } from "./canvas"
-import { ipfsDirectory, ipfsImage } from "./ipfs"
-import {
-  Attr,
-  Attributes,
-  StandardType,
-  TileAttributes,
-  TileType,
-  Type,
-} from "./types"
+import { File } from "nft.storage"
+import { saveDirectory, saveMetadata, savePicture } from "./ipfs"
+import drawRandomNFT, { allData } from "./NFT"
 
-const allNFT: FilesSource = []
+const allNFT: File[] = []
 
 loadImage("./src/assets/Texture.png").then(async (image) => {
   // generate 10000 tile map and save to file
-  for (let i = 0; i < 100; i++) {
-    const tileMap = generateTile()
-
-    const cols = tileMap[0] % rows
-    const type = TileType[cols] as Type
-
-    allData[type]++
-
-    const canvas = drawFromMap(image, tileMap)
-    // get the row and col of the tile map
-    let buildable = { trait_type: "Buildable", value: 0 }
-    let unBuildable = { trait_type: "UnBuildable", value: 0 }
-
-    const attributes: StandardType[] = [
-      {
-        trait_type: "Base",
-        value: type,
-      },
-      buildable,
-      unBuildable,
-    ]
-
-    tileMap.forEach((item) => {
-      const value = TileAttributes[Math.trunc(item / rows)] as Attr
-
-      allData[value]++
-      switch (value) {
-        case "Base":
-          buildable.value++
-          break
-        case "Effect":
-          buildable.value++
-          break
-        case "UnBuildable":
-          unBuildable.value++
-          break
-        default:
-          attributes.push({ trait_type: "Resource", value })
-          break
-      }
-    })
+  for (let i = 0; i < 10; i++) {
+    const { canvas, attributes } = drawRandomNFT(
+      image,
+      [60, 20, 15, 5],
+      [30, 20, 20, 10, 10, 7, 5, 2.5, 1]
+    )
     try {
-      const pngData = await canvas.encode("png")
-      const url = await ipfsImage(pngData, i.toString())
+      const url = await savePicture(canvas, i, true)
 
       console.log(i, url)
+
       const metadata = {
         name: `SmartLand #${i}`,
         external_url: `https://smartworld.app/nft/${i}`,
@@ -71,47 +26,13 @@ loadImage("./src/assets/Texture.png").then(async (image) => {
         image: `ipfs://${url}`,
         attributes,
       }
-      await savePicture(pngData, `../dist/images/${i}.png`)
-      await saveJson(metadata, `../dist/metadata/${i}.json`)
-      // Save metadata as file
-      const nft = new File(
-        [JSON.stringify(metadata, null, 2)],
-        `/nft/${i}.json`,
-        {
-          type: "application/json",
-        }
-      )
-      // @ts-ignore
-      allNFT[i] = nft
+
+      allNFT[i] = await saveMetadata(metadata, i)
     } catch (err) {
       console.log("url: ", err)
     }
   }
-  await saveJson(allData, "./assets/allData.json")
-  const allUrl = await ipfsDirectory(allNFT)
-  console.log(allUrl)
+
+  const ipfs = await saveDirectory(allNFT, allData, true)
+  console.log(ipfs)
 })
-
-const allData: Attributes = {
-  Base: 0,
-  Grass: 0,
-  Snow: 0,
-  Water: 0,
-  Sand: 0,
-  Effect: 0,
-  UnBuildable: 0,
-  Tree: 0,
-  Charcoal: 0,
-  Iron: 0,
-  Gold: 0,
-  Crystal: 0,
-  Diamond: 0,
-}
-
-const saveJson = async (data: any, url: string) => {
-  await promises.writeFile(join(__dirname, url), JSON.stringify(data, null, 2))
-}
-
-const savePicture = async (data: Buffer, url: string) => {
-  await promises.writeFile(join(__dirname, url), data)
-}

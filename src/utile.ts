@@ -1,1 +1,1 @@
-export const isRandom = (chance = 100) => Math.random() * 100 < chance
+export const selectRandom = (chance = 100) => Math.random() * 100 < chance
