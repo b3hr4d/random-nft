@@ -70,5 +70,5 @@ export default function drawRandomNFT(
         break
     }
   })
-  return { canvas, attributes }
+  return { canvas, tileMap, attributes }
 }

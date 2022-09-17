@@ -21,9 +21,9 @@ export const generateTileMap = (typeChance: number[], tileChance: number[]) => {
     0
   )
 
-  const newTileMap: number[] = Array.from({ length: tileNumber * tileNumber })
+  const newTileMap = new Uint8Array(tileNumber * tileNumber)
 
-  return newTileMap.reduce((all) => {
+  for (let i = 0; i < tileNumber * tileNumber; i++) {
     const randomIndex = tileChance.findIndex((cur) => selectRandom(cur))
     const randomTile = randomIndex > 0 ? randomIndex : 0
 
@@ -31,11 +31,12 @@ export const generateTileMap = (typeChance: number[], tileChance: number[]) => {
 
     const tile = randomTile * rows + randomType
 
-    return [...all, isUnique && all.includes(tile) ? randomType : tile]
-  }, [] as number[])
+    newTileMap[i] = isUnique && newTileMap.includes(tile) ? randomType : tile
+  }
+  return newTileMap
 }
 
-export const drawFromMap = (img: any, tileMap: number[]) => {
+export const drawFromMap = (img: any, tileMap: Uint8Array) => {
   clear()
 
   tileMap.forEach((t: number, i: number) => {

@@ -1,15 +1,15 @@
 {
-  "Base": 108,
-  "Grass": 5,
-  "Snow": 1,
-  "Water": 3,
-  "Sand": 1,
-  "Effect": 10,
-  "UnBuildable": 22,
-  "Tree": 5,
-  "Charcoal": 5,
-  "Iron": 6,
-  "Gold": 3,
-  "Crystal": 1,
-  "Diamond": 0
+  "Base": 1146,
+  "Grass": 62,
+  "Snow": 17,
+  "Water": 14,
+  "Sand": 7,
+  "Effect": 96,
+  "UnBuildable": 174,
+  "Tree": 52,
+  "Charcoal": 60,
+  "Iron": 30,
+  "Gold": 20,
+  "Crystal": 15,
+  "Diamond": 7
 }
