@@ -1,14 +1,16 @@
 import { loadImage } from "@napi-rs/canvas"
 import { hexlify } from "ethers/lib/utils"
 import { File } from "nft.storage"
-import { saveDirectory, saveMetadata, savePicture } from "./ipfs"
+import { fileSync, saveDirectory, saveMetadata, savePicture } from "./files"
 import drawRandomNFT, { allData } from "./NFT"
+import { MetaData } from "./types"
 
 const allNFT: File[] = []
+const allMeta: { [key: string]: [string, string] } = {}
 
 const online = true
 
-loadImage("./src/assets/Texture.png").then(async (image) => {
+loadImage("./src/Texture.png").then(async (image) => {
   // generate 10000 tile map and save to file
   for (let i = 0; i < 100; i++) {
     const { canvas, tileMap, attributes } = drawRandomNFT(
@@ -21,18 +23,23 @@ loadImage("./src/assets/Texture.png").then(async (image) => {
 
       console.log(i, url)
 
-      const metadata = {
+      const image = `ipfs://${url}`
+      const data = hexlify(tileMap)
+
+      const metadata: MetaData = {
         name: `SmartLand #${i}`,
         external_url: `https://smartworld.app/nft/${i}`,
         description:
           "It leaves in the 3d Earth on the home page of the website.",
-        image: `ipfs://${url}`,
-        chainData: hexlify(tileMap),
+        image,
+        data,
         tileMap,
         attributes,
       }
 
-      allNFT[i] = await saveMetadata(metadata, i)
+      allMeta[i] = [image, data]
+      fileSync(allMeta)
+      allNFT.push(await saveMetadata(metadata, i))
     } catch (err) {
       console.log("url: ", err)
     }
@@ -40,5 +47,5 @@ loadImage("./src/assets/Texture.png").then(async (image) => {
 
   const ipfs = await saveDirectory(allNFT, allData, online)
 
-  console.log(ipfs)
+  console.log("allNFT", ipfs)
 })

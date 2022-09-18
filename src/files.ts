@@ -1,11 +1,12 @@
 import { Canvas } from "@napi-rs/canvas"
 import { writeFile } from "fs/promises"
+import { writeFileSync } from "jsonfile"
 import { File, FilesSource, NFTStorage } from "nft.storage"
 import { join } from "path"
 import { Attributes, MetaData } from "./types"
 
-const NFT_STORAGE_TOKEN =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweEUwRWIxNTFFZTYwQTdCNjgxODg0OEM0N2E5MDFjOTYyRkI4MjA3ODAiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY2MzIzNjY4OTg0MiwibmFtZSI6IlNtYXJ0TGFuZCJ9.80TUpP0W3mQbJukiMFuVpm-fRigdDLfZ9sI2QZKAIac"
+const NFT_STORAGE_TOKEN = process.env.NFT_STORAGE_TOKEN || ""
+
 const client = new NFTStorage({ token: NFT_STORAGE_TOKEN })
 
 const getPath = (path: string) => join(__dirname, path)
@@ -41,9 +42,13 @@ export const saveDirectory = async (
   ipfs?: boolean
 ) => {
   await writeFile(
-    getPath("./assets/allData.json"),
+    getPath("../dist/allData.json"),
     JSON.stringify(allData, null, 2)
   )
 
   return ipfs ? await client.storeDirectory(file) : ""
+}
+
+export const fileSync = (allMeta: { [key: string]: [string, string] }) => {
+  writeFileSync(getPath("../dist/allMeta.json"), allMeta, { spaces: 2 })
 }

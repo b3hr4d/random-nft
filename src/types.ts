@@ -27,6 +27,8 @@ export interface MetaData {
   external_url: string
   description: string
   image: string
+  data: string
+  tileMap: Uint8Array
   attributes: StandardType[]
 }
 

@@ -9,9 +9,9 @@ export const tileHeight = 64,
   rows = 9,
   width = tileWidth * tileNumber,
   height = tileWidth * tileNumber,
-  canvas = createCanvas(width, height)
+  canvas = createCanvas(width, height),
+  ctx = canvas.getContext("2d")
 
-const ctx = canvas.getContext("2d")
 ctx.translate(width / 2, tileHeight * 2.5)
 
 // generate random tile map

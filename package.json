@@ -4,7 +4,9 @@
   "main": "src/app.ts",
   "license": "MIT",
   "scripts": {
-    "build": "rimraf ./build && tsc",
+    "replace": "rimraf ./build && tsc",
+    "start": "npm run replace && node build",
+    "start:background": "nohup npm run start &",
     "start:dev": "nodemon"
   },
   "devDependencies": {
